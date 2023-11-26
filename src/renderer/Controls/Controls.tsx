@@ -11,6 +11,7 @@ import PlayButton from './PlayButton';
 import InstallStatus from './InstallStatus';
 
 export default function Controls() {
+  const [loaded, setLoaded] = useState<boolean>(false);
   const [installedVersion, setInstalledVersion] = useState<number>(null);
   const [availableUpdate, setAvailableUpdate] = useState<ReleaseInfo>(null);
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus>(null);
@@ -18,6 +19,7 @@ export default function Controls() {
 
   async function requestAvailableUpdate() {
     const response = await window.installationApi.checkAvailableUpdate();
+    setLoaded(true);
     setInstalledVersion(response.currentVersion);
     if (response.error) {
       window.appApi.showMessageBox(
@@ -36,7 +38,15 @@ export default function Controls() {
     requestAvailableUpdate();
   }, []);
 
-  const playButtonText: string = (() => {
+  if (!loaded) {
+    return (
+      <div className="Controls">
+        <h1>Checking updates...</h1>
+      </div>
+    );
+  }
+
+  const playButtonText = (() => {
     if (gameLaunched) {
       return 'LAUNCHED';
     }
