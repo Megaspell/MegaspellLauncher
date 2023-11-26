@@ -1,15 +1,7 @@
 {
-  "description": "Launcher for Megaspell",
-  "keywords": [
-    "electron",
-    "react",
-    "typescript",
-    "ts",
-    "sass",
-    "webpack",
-    "hot",
-    "reload"
-  ],
+  "name": "megaspell-launcher",
+  "version": "1.0.0",
+  "description": "Launcher for Megaspell game",
   "homepage": "https://github.com/Megaspell/MegaspellLauncher",
   "bugs": {
     "url": "https://github.com/Megaspell/MegaspellLauncher/issues"
@@ -107,10 +99,12 @@
   "dependencies": {
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.8",
+    "electron-store": "^8.1.0",
     "electron-updater": "^6.1.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.16.0"
+    "react-router-dom": "^6.16.0",
+    "unzipper": "^0.10.14"
   },
   "devDependencies": {
     "@electron/notarize": "^2.1.0",
@@ -180,8 +174,8 @@
     "webpack-merge": "^5.9.0"
   },
   "build": {
-    "productName": "MegaspellLauncher",
-    "appId": "com.shimmermare.megaspell.MegaspellLauncher",
+    "productName": "Megaspell Launcher",
+    "appId": "net.megaspell.MegaspellLauncher",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -236,6 +230,10 @@
     },
     "extraResources": [
       "./assets/**"
+    ],
+    "extraFiles": [
+      "./LICENSE.txt",
+      "./config.json"
     ],
     "publish": {
       "provider": "github",

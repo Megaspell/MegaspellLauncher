@@ -1,0 +1,4 @@
+### GET request with a header
+GET https://api.github.com/repos/Megaspell/Megaspell-Releases-Dev/releases/latest
+Accept: application/json
+Authorization: Bearer {{ githubToken }}

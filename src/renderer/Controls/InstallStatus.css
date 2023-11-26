@@ -1,0 +1,10 @@
+.InstallStatus {
+  margin: 8px 0;
+}
+
+.InstallStatus > h1 {
+  margin: 8px 0;
+}
+.InstallStatus > h2 {
+  margin: 0;
+}

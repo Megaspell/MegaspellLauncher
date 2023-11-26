@@ -1,0 +1,32 @@
+.PlayButton {
+  width: 200px;
+  height: 64px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border-width: 2px;
+  border-style: solid;
+  border-image: linear-gradient(to right, #0F8 0%, transparent 15%, transparent 85%, #0F8 100%) 1;
+  background: #222;
+}
+
+.PlayButton:hover:enabled {
+  border-image: 0;
+  border-color: #00FF88;
+  scale: 1.05;
+}
+
+.PlayButton:active {
+  scale: 1;
+}
+
+.PlayButton:disabled {
+ filter: brightness(0.5) saturate(0.5);
+}
+
+.PlayButton > h1 {
+  color: #0F8;
+  font-size: 3.5em;
+  font-weight: 500;
+}

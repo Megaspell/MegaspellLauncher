@@ -1,0 +1,26 @@
+.WindowButtonGroup {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.WindowButton {
+  background: transparent;
+  margin: 0;
+  padding: 4px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+}
+
+.WindowButton:hover {
+  background: #fff1;
+  scale: 1.1;
+  border-image: linear-gradient(to right, #0F8 0%, transparent 33%, transparent 67%, #0F8 100%) 1;
+}
+
+.WindowButton > img {
+  display: block;
+}

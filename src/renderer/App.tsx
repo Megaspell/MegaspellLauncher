@@ -1,40 +1,25 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import icon from '../../assets/icon.png';
-import './App.css';
+import { MemoryRouter as Router, Route, Routes } from 'react-router-dom';
 
-function Hello() {
+import Blog from './Blog/Blog';
+import WindowButtonGroup from './WindowButtonGroup';
+import SocialButtonGroup from './SocialButtonGroup';
+import Controls from './Controls/Controls';
+
+import './App.css';
+import logoImage from '../../assets/Megaspell_Logo.png';
+
+function Content() {
   return (
-    <div>
-      <div className="Hello">
-        <img width="200" alt="icon" src={icon} />
+    <div className="Content">
+      <div className="ContentLeft">
+        <img alt="" height="64px" src={logoImage} />
+        <Controls />
       </div>
-      <h1>electron-react-boilerplate</h1>
-      <div className="Hello">
-        <a
-          href="https://electron-react-boilerplate.js.org/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              📚
-            </span>
-            Read our docs
-          </button>
-        </a>
-        <a
-          href="https://github.com/sponsors/electron-react-boilerplate"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="folded hands">
-              🙏
-            </span>
-            Donate
-          </button>
-        </a>
+      <div className="ContentRight">
+        <Blog />
       </div>
+      <WindowButtonGroup />
+      <SocialButtonGroup />
     </div>
   );
 }
@@ -43,7 +28,7 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Hello />} />
+        <Route path="/" element={<Content />} />
       </Routes>
     </Router>
   );

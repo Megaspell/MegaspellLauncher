@@ -9,27 +9,15 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
-import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
-import MenuBuilder from './menu';
+import { app, BrowserWindow, shell } from 'electron';
 import { resolveHtmlPath } from './util';
-
-class AppUpdater {
-  constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
+import LauncherConfig, { loadConfig } from './LauncherConfig';
+import GameInstallationServiceImpl from './GameInstallationServiceImpl';
+import StoreServiceImpl from './StoreServiceImpl';
+import GameLaunchServiceImpl from './GameLaunchServiceImpl';
+import AppServiceImpl from './AppServiceImpl';
 
 let mainWindow: BrowserWindow | null = null;
-
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -42,6 +30,24 @@ const isDebug =
 if (isDebug) {
   require('electron-debug')();
 }
+
+const launcherConfig: LauncherConfig = loadConfig();
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const services = [
+  new AppServiceImpl(() => mainWindow),
+  new StoreServiceImpl(),
+  new GameInstallationServiceImpl(launcherConfig),
+  new GameLaunchServiceImpl(),
+];
+
+app.on('window-all-closed', () => {
+  // Respect the OSX convention of having the application in memory even
+  // after all windows have been closed
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
 
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
@@ -70,9 +76,11 @@ const createWindow = async () => {
   };
 
   mainWindow = new BrowserWindow({
-    show: false,
     width: 1024,
-    height: 728,
+    height: 576,
+    show: true,
+    frame: false,
+    resizable: false,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
@@ -80,6 +88,8 @@ const createWindow = async () => {
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
   });
+
+  mainWindow.removeMenu();
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
@@ -98,9 +108,6 @@ const createWindow = async () => {
     mainWindow = null;
   });
 
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
-
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
     shell.openExternal(edata.url);
@@ -108,21 +115,8 @@ const createWindow = async () => {
   });
 
   // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater();
+  // new AppUpdater();
 };
-
-/**
- * Add event listeners...
- */
-
-app.on('window-all-closed', () => {
-  // Respect the OSX convention of having the application in memory even
-  // after all windows have been closed
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
 
 app
   .whenReady()
