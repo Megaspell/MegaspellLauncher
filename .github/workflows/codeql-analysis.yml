@@ -12,11 +12,13 @@
 name: "CodeQL"
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [ "main" ]
+  workflow_dispatch:
+# Disable until repo is public and we can enable code analysis
+#  push:
+#    branches: [ "main" ]
+#  pull_request:
+#    # The branches below must be a subset of the branches above
+#    branches: [ "main" ]
 
 jobs:
   analyze:
