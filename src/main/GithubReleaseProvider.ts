@@ -55,7 +55,7 @@ export default class GithubReleaseProvider implements ReleaseProvider {
 
   private bus = new EventEmitter();
 
-  private locked: boolean;
+  private locked: boolean = false;
 
   async getRepoReleases(stream: ReleaseStream): Promise<RepoReleases> {
     const cached = this.cachedReleasesByRepo.get(stream.githubRepository);
@@ -136,7 +136,7 @@ export default class GithubReleaseProvider implements ReleaseProvider {
     limit?: number,
   ): Promise<AppRelease[]> {
     return this.getRepoReleases(stream).then((releases) =>
-      limit ? releases.releases.slice(0, limit) : releases.releases,
+      limit ? releases.appReleases.slice(0, limit) : releases.appReleases,
     );
   }
 
@@ -184,14 +184,6 @@ export default class GithubReleaseProvider implements ReleaseProvider {
       throw new Error(`Release not found for version ${version}`);
     }
 
-    const headers = {
-      Accept: 'application/octet-stream',
-    };
-    if (stream.githubToken) {
-      // eslint-disable-next-line dot-notation
-      headers['Authorization'] = `Bearer ${stream.githubToken}`;
-    }
-
     const artifactName = `${currentPlatform}.zip`;
     const downloadPath = path.resolve(destination, artifactName);
     if (fs.existsSync(downloadPath)) {
@@ -202,10 +194,16 @@ export default class GithubReleaseProvider implements ReleaseProvider {
 
     let downloaded = 0;
 
-    const incrementDownloaded = (chunk) => {
+    const incrementDownloaded = (chunk: any) => {
       downloaded += chunk.length;
       onDownloadProgress(downloaded);
     };
+
+    const headers = new Headers();
+    headers.set('Accept', 'application/octet-stream');
+    if (stream.githubToken) {
+      headers.set('Authorization', `Bearer ${stream.githubToken}`);
+    }
 
     const response = await fetch((release.artifact as GithubReleaseAsset).url, {
       headers,
@@ -248,12 +246,10 @@ export default class GithubReleaseProvider implements ReleaseProvider {
 
     const url = `https://api.github.com/repos/${stream.githubRepository}/${endpoint}`;
 
-    const headers = {
-      Accept: 'application/json',
-    };
+    const headers = new Headers();
+    headers.set('Accept', 'application/json');
     if (stream.githubToken) {
-      // eslint-disable-next-line dot-notation
-      headers['Authorization'] = `Bearer ${stream.githubToken}`;
+      headers.set('Authorization', `Bearer ${stream.githubToken}`);
     }
 
     const res = await fetch(url, { headers });

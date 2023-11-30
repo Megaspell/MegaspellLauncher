@@ -15,7 +15,7 @@ export interface InstallProgress {
    * Progress from 0 to 1.
    */
   stageProgress: number;
-  version: number;
+  version: string;
   /**
    * Download size in bytes.
    */

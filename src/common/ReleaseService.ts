@@ -63,10 +63,7 @@ export default interface ReleaseService {
    * Get last {@link limit} app releases, ordered starting from most recent.
    * Release provider may have its own limit smaller than provided one.
    */
-  getLastReleases(
-    stream: ReleaseStream,
-    limit: number = 50,
-  ): Promise<AppRelease[]>;
+  getLastReleases(stream: ReleaseStream, limit: number): Promise<AppRelease[]>;
 
   /**
    * Get release by version from stream if it exists.

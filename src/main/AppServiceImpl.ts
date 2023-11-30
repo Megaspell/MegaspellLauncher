@@ -57,7 +57,7 @@ export default class AppServiceImpl implements AppService {
       })
       .then((result) => {
         if (result.canceled) {
-          return path;
+          return path ?? null;
         }
         return result.filePaths.length > 0 ? result.filePaths[0] : null;
       });

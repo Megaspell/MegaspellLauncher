@@ -197,7 +197,7 @@ export default class InstallationServiceImpl implements InstallationService {
       return;
     }
 
-    status.version = appRelease.version as number;
+    status.version = appRelease.version;
     status.downloadSize = appRelease.downloadSize;
     status.stage = InstallStage.PreCleanup;
     onStatusChange(status);
@@ -251,7 +251,7 @@ export default class InstallationServiceImpl implements InstallationService {
     await fs
       .createReadStream(artifactPath)
       .pipe(unzipper.Parse())
-      .on('entry', (entry) => {
+      .on('entry', (entry: any) => {
         const file = path.resolve(installDir, entry.path);
         if (entry.type === 'Directory') {
           return;
@@ -266,7 +266,7 @@ export default class InstallationServiceImpl implements InstallationService {
         entry.pipe(fileStream);
       })
       .promise()
-      .catch((e) => console.log('Failed to unzip artifact', e));
+      .catch((e: Error) => console.log('Failed to unzip artifact', e));
   }
 
   private registerIpc() {

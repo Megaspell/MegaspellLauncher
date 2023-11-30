@@ -3,8 +3,8 @@
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
 @font-face {
-  font-family: Monofonto, monospace;
-  src: url(../../assets/fonts/Monofonto-Regular.ttf);
+  font-family: Monofonto;
+  src: url("assets/fonts/Monofonto-Regular.ttf") format("truetype");
 }
 
 * {
