@@ -16,7 +16,6 @@ const updateStageNames = new Map<InstallStage, string>([
   [InstallStage.Installing, 'Installing'],
   [InstallStage.PostCleanup, 'Cleaning temp files'],
   [InstallStage.Complete, 'Complete'],
-  [],
 ]);
 
 function createUpdateStageText(updateStatus: InstallProgress): string {
@@ -87,11 +86,5 @@ export default function InstallStatus(props: InstallStatusProps) {
     );
   }
 
-  return (
-    <div className="InstallStatus">
-      <b className="error">
-        Failed to find installation files. Please try again later.
-      </b>
-    </div>
-  );
+  return <div className="InstallStatus">Loading...</div>;
 }

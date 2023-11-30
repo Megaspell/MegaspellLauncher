@@ -129,7 +129,7 @@ function AddReleaseStreamModal(props: AddReleaseStreamModalProps) {
       <IconButton
         title="Add stream"
         icon={addIcon}
-        iconSize="24"
+        iconSize={24}
         onClick={() => setOpen(true)}
       />
       {open ? dialog : undefined}

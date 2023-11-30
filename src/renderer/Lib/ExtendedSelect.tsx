@@ -27,7 +27,7 @@ function ExtendedSelect<Option>(props: ExtendedSelectProps<Option>) {
       className="ExtendedSelect"
       options={options}
       value={value}
-      onChange={(newValue) => onChange(newValue)}
+      onChange={(newValue) => onChange(newValue as Option)}
       getOptionLabel={getOptionLabel}
       getOptionValue={getOptionValue}
       isSearchable={isSearchable}
