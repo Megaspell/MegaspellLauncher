@@ -21,6 +21,7 @@ import InstallStatus from './Controls/InstallStatus';
 import ReleaseStreamSelector from './Controls/ReleaseStreamSelector';
 import AppVersionSelector from './Controls/AppVersionSelector';
 import { useCancellableEffect } from '../hooks';
+import GraphicsApiSelector from './Controls/GraphicsApiSelector';
 
 export default function MainPage() {
   const [currentReleaseStream, setCurrentReleaseStream] =
@@ -233,6 +234,7 @@ export default function MainPage() {
               current={currentVersion}
               onSelect={requestSetCurrentVersion}
             />
+            <GraphicsApiSelector />
             <InstallStatus
               installationStatus={installationStatus}
               availableUpdate={availableUpdate}

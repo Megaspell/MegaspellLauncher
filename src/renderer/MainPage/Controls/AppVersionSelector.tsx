@@ -6,6 +6,7 @@ import {
 } from '../../../common/ReleaseService';
 import ExtendedSelect from '../../Lib/ExtendedSelect';
 import { useCancellableEffect } from '../../hooks';
+import './SelectorControl.css';
 
 export interface AppVersionSelectorProps {
   releaseStream: ReleaseStream;
@@ -50,11 +51,14 @@ export default function AppVersionSelector(props: AppVersionSelectorProps) {
   const { current, onSelect } = props;
 
   return (
-    <div className="ReleaseStreamSelector">
+    <div className="SelectorControl">
       <h2>Version</h2>
       <ExtendedSelect<AppRelease>
         options={selectableVersions}
-        value={{ version: current, downloadSize: 0 }}
+        value={{
+          version: current,
+          downloadSize: 0,
+        }}
         onChange={(option: AppRelease) => {
           onSelect(option.version);
         }}

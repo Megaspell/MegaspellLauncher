@@ -1,6 +1,6 @@
 // Disable no-unused-vars, broken for spread args
 /* eslint no-unused-vars: off */
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 import AppService, {
   CloseChannel,
@@ -20,9 +20,12 @@ import InstallationService, {
 import LaunchService, {
   GetCurrentAppVersionChannel,
   GetCurrentReleaseStreamChannel,
+  GetGraphicsApiChannel,
+  GraphicsApi,
   LaunchAppChannel,
   SetCurrentAppVersionChannel,
   SetCurrentReleaseStreamChannel,
+  SetGraphicsApiChannel,
 } from '../common/LaunchService';
 import ReleaseService, {
   AddReleaseStreamChannel,
@@ -92,7 +95,7 @@ const installationApi: InstallationService = {
     force: boolean,
     onStatusChange: (status: InstallProgress) => void,
   ) => {
-    const listener = (event, status: InstallProgress) => {
+    const listener = (event: IpcRendererEvent, status: InstallProgress) => {
       onStatusChange(status);
     };
     ipcRenderer.on(InstallOrUpdateChannel, listener);
@@ -113,6 +116,9 @@ const launchApi: LaunchService = {
   setCurrentAppVersion: (version: string | null) =>
     ipcRenderer.invoke(SetCurrentAppVersionChannel, version),
 
+  getGraphicsApi: () => ipcRenderer.invoke(GetGraphicsApiChannel),
+  setGraphicsApi: (api: GraphicsApi | null) =>
+    ipcRenderer.invoke(SetGraphicsApiChannel, api),
   launchApp: () => ipcRenderer.invoke(LaunchAppChannel),
 };
 

@@ -24,10 +24,10 @@ interface GithubReleaseAsset {
 
 interface GithubRelease {
   tag_name: string;
-  body: string | null;
+  body?: string;
   draft: boolean;
   prerelease: boolean;
-  published_at: string | null;
+  published_at?: string;
   assets: GithubReleaseAsset[];
 }
 
@@ -35,8 +35,8 @@ const perPageLimit = 100;
 
 interface ProcessedRelease {
   version: string;
-  publishedAt: string | null;
-  changelog: string | null;
+  publishedAt?: string;
+  changelog?: string;
   /**
    * Artifact may be split in volumes, in this case this is an array in correct order.
    */
@@ -205,30 +205,20 @@ export default class GithubReleaseProvider implements ReleaseProvider {
       headers.set('Authorization', `Bearer ${stream.githubToken}`);
     }
 
-    const response = await fetch((release.artifact as GithubReleaseAsset).url, {
-      headers,
-    });
-    const fileStream = fs.createWriteStream(downloadPath, { flags: 'a' });
-    await finished(
-      Readable.fromWeb(response.body as ReadableStream)
-        .on('data', incrementDownloaded)
-        .pipe(fileStream),
-    );
+    const artifact = Array.isArray(release.artifact)
+      ? release.artifact
+      : [release.artifact];
 
-    // const artifact = Array.isArray(release.artifact)
-    //  ? release.artifact
-    //  : [release.artifact];
-    //
-    /// / eslint-disable-next-line no-restricted-syntax
-    // for await (const asset of artifact) {
-    //  const response = await fetch(asset.url, { headers });
-    //  const fileStream = fs.createWriteStream(downloadPath, { flags: 'a' });
-    //  await finished(
-    //    Readable.fromWeb(response.body as ReadableStream)
-    //      .on('data', incrementDownloaded)
-    //      .pipe(fileStream),
-    //  );
-    // }
+    // eslint-disable-next-line no-restricted-syntax
+    for await (const asset of artifact) {
+      const response = await fetch(asset.url, { headers });
+      const fileStream = fs.createWriteStream(downloadPath, { flags: 'a' });
+      await finished(
+        Readable.fromWeb(response.body as ReadableStream)
+          .on('data', incrementDownloaded)
+          .pipe(fileStream),
+      );
+    }
 
     return {
       version: release.version,

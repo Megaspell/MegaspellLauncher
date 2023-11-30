@@ -27,7 +27,7 @@ function ExtendedSelect<Option>(props: ExtendedSelectProps<Option>) {
       className="ExtendedSelect"
       options={options}
       value={value}
-      onChange={onChange}
+      onChange={(newValue) => onChange(newValue)}
       getOptionLabel={getOptionLabel}
       getOptionValue={getOptionValue}
       isSearchable={isSearchable}
@@ -40,8 +40,8 @@ function ExtendedSelect<Option>(props: ExtendedSelectProps<Option>) {
 
 ExtendedSelect.defaultProps = {
   isSearchable: false,
-  getOptionLabel: (o) => String(o),
-  getOptionValue: (o) => String(o),
+  getOptionLabel: (o: any) => String(o),
+  getOptionValue: (o: any) => String(o),
   maxMenuHeight: 130,
 };
 

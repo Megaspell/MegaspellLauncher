@@ -11,7 +11,7 @@ export default class StoreServiceImpl implements StoreService {
   }
 
   get(key: string): object | string | number | null | undefined {
-    return this.store.get(key);
+    return this.store.get(key) as object | string | number | null | undefined;
   }
 
   set(key: string, value: object | string | number): void {

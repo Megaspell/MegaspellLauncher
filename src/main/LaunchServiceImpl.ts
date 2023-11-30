@@ -7,9 +7,12 @@ import path from 'path';
 import LaunchService, {
   GetCurrentAppVersionChannel,
   GetCurrentReleaseStreamChannel,
+  GetGraphicsApiChannel,
+  GraphicsApi,
   LaunchAppChannel,
   SetCurrentAppVersionChannel,
   SetCurrentReleaseStreamChannel,
+  SetGraphicsApiChannel,
 } from '../common/LaunchService';
 import { currentPlatform } from './util';
 import TargetPlatform from '../common/TargetPlatform';
@@ -23,6 +26,7 @@ import StoreService from '../common/StoreService';
 
 const currentReleaseStreamStoreKey = 'currentReleaseStream';
 const currentAppVersionStoreKey = 'currentAppVersion';
+const graphicsApiStoreKey = 'graphicsApi';
 
 export default class LaunchServiceImpl implements LaunchService {
   private storeService: StoreService;
@@ -31,7 +35,7 @@ export default class LaunchServiceImpl implements LaunchService {
 
   private gameInstallationService: InstallationService;
 
-  private currentGameProcess?: ChildProcess;
+  private currentGameProcess: ChildProcess | null = null;
 
   constructor(
     storeService: StoreService,
@@ -92,6 +96,25 @@ export default class LaunchServiceImpl implements LaunchService {
     return true;
   }
 
+  async getGraphicsApi(): Promise<GraphicsApi | null> {
+    const value = this.storeService.get(graphicsApiStoreKey);
+    if (
+      typeof value === 'string' &&
+      Object.values(GraphicsApi).includes(value)
+    ) {
+      return value as GraphicsApi;
+    }
+    return null;
+  }
+
+  async setGraphicsApi(api: GraphicsApi | null): Promise<void> {
+    if (api) {
+      this.storeService.set(graphicsApiStoreKey, api);
+    } else {
+      this.storeService.delete(graphicsApiStoreKey);
+    }
+  }
+
   async launchApp() {
     if (this.currentGameProcess && !this.currentGameProcess.exitCode) {
       // Already launched, do nothing
@@ -110,19 +133,44 @@ export default class LaunchServiceImpl implements LaunchService {
       LaunchServiceImpl.getExecutableName(),
     );
 
-    const bus = new EventEmitter();
+    const args = await this.buildArgs();
 
     // eslint-disable-next-line camelcase
-    this.currentGameProcess = child_process.execFile(executablePath);
+    this.currentGameProcess = child_process.execFile(executablePath, args);
+
+    const bus = new EventEmitter();
 
     this.currentGameProcess.on('exit', () => {
-      this.currentGameProcess = null as ChildProcess;
+      this.currentGameProcess = null;
       bus.emit('exit');
     });
 
     await new Promise((resolve) => {
       bus.once('exit', resolve);
     });
+  }
+
+  private async buildArgs(): Promise<string[]> {
+    const args: string[] = [];
+
+    const graphicsApi = await this.getGraphicsApi();
+    if (graphicsApi) {
+      switch (graphicsApi) {
+        case GraphicsApi.Vulkan:
+          args.push('-force-vulkan');
+          break;
+        case GraphicsApi.DX12:
+          args.push('-force-d3d12');
+          break;
+        case GraphicsApi.DX11:
+          args.push('-force-d3d11');
+          break;
+        default:
+          break;
+      }
+    }
+
+    return args;
   }
 
   private registerIpc() {
@@ -140,6 +188,10 @@ export default class LaunchServiceImpl implements LaunchService {
     ipcMain.handle(
       SetCurrentAppVersionChannel,
       (event, version: string | null) => this.setCurrentAppVersion(version),
+    );
+    ipcMain.handle(GetGraphicsApiChannel, () => this.getGraphicsApi());
+    ipcMain.handle(SetGraphicsApiChannel, (event, api: GraphicsApi | null) =>
+      this.setGraphicsApi(api),
     );
     ipcMain.handle(LaunchAppChannel, () => this.launchApp());
   }

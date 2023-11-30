@@ -105,7 +105,6 @@ const createWindow = async () => {
     } else {
       mainWindow.show();
     }
-    mainWindow.webContents.openDevTools();
   });
 
   mainWindow.on('closed', () => {

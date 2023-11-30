@@ -61,7 +61,7 @@ function ListEntry(props: ListEntryProps) {
       <IconButton
         title="Remove stream"
         icon={deleteIcon}
-        iconSize="24"
+        iconSize={24}
         onClick={onRemoveClick}
       />
     </li>
@@ -82,7 +82,7 @@ function AddReleaseStreamModal(props: AddReleaseStreamModalProps) {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          const target = e.target as unknown;
+          const target = e.target as any;
           const id = target.id.value as string;
           const githubRepository = target.githubRepository.value as string;
           const githubToken = target.githubToken.value as string;
@@ -138,7 +138,7 @@ function AddReleaseStreamModal(props: AddReleaseStreamModalProps) {
 }
 
 export default function ReleaseStreamOption() {
-  const [releaseStreams, setReleaseStreams] = useState([]);
+  const [releaseStreams, setReleaseStreams] = useState<ReleaseStream[]>([]);
 
   async function updateReleaseStreams() {
     const streams = await window.releaseStreamApi.getStreams();

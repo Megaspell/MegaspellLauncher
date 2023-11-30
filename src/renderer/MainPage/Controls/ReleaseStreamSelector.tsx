@@ -3,8 +3,8 @@ import {
   DefaultReleaseStream,
   ReleaseStream,
 } from '../../../common/ReleaseService';
-import './ReleaseStreamSelector.css';
 import ExtendedSelect from '../../Lib/ExtendedSelect';
+import './SelectorControl.css';
 
 export interface ReleaseStreamSelectorProps {
   current: ReleaseStream;
@@ -31,8 +31,12 @@ export default function ReleaseStreamSelector(
 
   const { current, onSelect } = props;
 
+  if (streams.length < 2) {
+    return undefined;
+  }
+
   return (
-    <div className="ReleaseStreamSelector">
+    <div className="SelectorControl">
       <h2>Release stream</h2>
       <ExtendedSelect<ReleaseStream>
         options={streams}
