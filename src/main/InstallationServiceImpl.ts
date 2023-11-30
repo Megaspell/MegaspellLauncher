@@ -13,6 +13,7 @@ import InstallationService, {
 } from '../common/InstallationService';
 import ReleaseService, { AppRelease } from '../common/ReleaseService';
 import StoreService from '../common/StoreService';
+import { tempDir } from './util';
 
 const unzipper = require('unzipper');
 
@@ -79,6 +80,10 @@ export default class InstallationServiceImpl implements InstallationService {
 
   // eslint-disable-next-line class-methods-use-this
   private async cleanupInterruptedInstall() {
+    if (fs.existsSync(tempDir)) {
+      await fs.promises.rm(tempDir, { recursive: true });
+    }
+
     if (!fs.existsSync(installLockFilePath)) return;
 
     const installLock = await fs.promises
@@ -214,7 +219,7 @@ export default class InstallationServiceImpl implements InstallationService {
     const { artifactPath } = await this.releaseService.downloadReleaseArtifact(
       stream,
       appRelease.version,
-      path.resolve(app.getPath('temp'), app.name),
+      tempDir,
       (bytesDownloaded) => {
         status.stageProgress = bytesDownloaded / appRelease.downloadSize;
         onStatusChange(status);

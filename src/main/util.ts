@@ -8,6 +8,8 @@ export const appDir: string =
     ? app.getAppPath()
     : path.dirname(app.getPath('exe'));
 
+export const tempDir: string = path.resolve(app.getPath('temp'), app.name);
+
 export const currentPlatform: TargetPlatform = (() => {
   switch (process.platform) {
     case 'win32':
