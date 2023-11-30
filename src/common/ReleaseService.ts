@@ -26,6 +26,8 @@ export const DefaultReleaseStream: ReleaseStream = {
 
 export interface AppRelease {
   version: string;
+  changelog: string | null;
+  publishedAt: string | null;
   /**
    * Download size in bytes for current platform.
    */

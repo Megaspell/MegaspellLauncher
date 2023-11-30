@@ -13,10 +13,18 @@
   font-weight: normal;
 }
 
+*:focus {
+  outline: 1px solid #FFFFFF55;
+}
+
+html {
+  --theme: #00FF99;
+}
+
 body {
   background-color: black;
   position: relative;
-  color: #00FF88;
+  color: var(--theme);
   overflow: hidden;
   margin: 0;
   padding: 0;
@@ -27,7 +35,7 @@ body {
 }
 
 a {
-  color: #00FF88;
+  color: var(--theme);
   text-decoration: none;
   -webkit-app-region: no-drag;
 }
@@ -57,13 +65,9 @@ button:disabled {
 }
 
 input {
-  color: #00FF88;
+  color: var(--theme);
   border-width: 1px;
-  border-color: #00FF88;
+  border-color: var(--theme);
   background: #222;
   padding: 4px;
-}
-
-*:focus {
-  outline: 1px solid #FFFFFF55;
 }

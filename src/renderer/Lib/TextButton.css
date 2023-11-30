@@ -1,13 +1,13 @@
 .TextButton {
-  color: #00FF88;
+  color: var(--theme);
   background: #fff1;
   margin: 0;
   padding: 4px 8px;
   font-size: 1.25rem;
   border-width: 2px;
   border-style: solid;
-  border-color: #00FF88;
-  border-image: linear-gradient(to right, #0F8 0%, transparent 20%, transparent 80%, #0F8 100%) 1;
+  border-color: var(--theme);
+  border-image: linear-gradient(to right, var(--theme) 0%, transparent 20%, transparent 80%, var(--theme) 100%) 1;
 }
 
 button.TextButton:hover:enabled {

@@ -272,7 +272,7 @@ export default function MainPage() {
           </div>
         </div>
         <div className="PageRight">
-          <Blog />
+          <Blog releaseStream={currentReleaseStream} />
         </div>
       </div>
     </Page>

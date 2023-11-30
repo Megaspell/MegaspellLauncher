@@ -24,7 +24,10 @@ interface GithubReleaseAsset {
 
 interface GithubRelease {
   tag_name: string;
-  published_at: string;
+  body: string | null;
+  draft: boolean;
+  prerelease: boolean;
+  published_at: string | null;
   assets: GithubReleaseAsset[];
 }
 
@@ -32,7 +35,8 @@ const perPageLimit = 100;
 
 interface ProcessedRelease {
   version: string;
-  publishedAt: string;
+  publishedAt: string | null;
+  changelog: string | null;
   /**
    * Artifact may be split in volumes, in this case this is an array in correct order.
    */
@@ -83,6 +87,7 @@ export default class GithubReleaseProvider implements ReleaseProvider {
 
     // Order of releases can differ from order of tags
     const releases: ProcessedRelease[] = rawReleases
+      .filter((r) => !r.draft && !r.prerelease)
       .flatMap((r) => {
         const artifact =
           GithubReleaseProvider.findArtifactForCurrentPlatform(r);
@@ -92,6 +97,7 @@ export default class GithubReleaseProvider implements ReleaseProvider {
           {
             version: r.tag_name,
             publishedAt: r.published_at,
+            changelog: r.body,
             artifact,
           } as ProcessedRelease,
         ];
@@ -105,6 +111,8 @@ export default class GithubReleaseProvider implements ReleaseProvider {
 
       return {
         version: r.version,
+        changelog: r.changelog,
+        publishedAt: r.publishedAt,
         downloadSize,
       };
     });

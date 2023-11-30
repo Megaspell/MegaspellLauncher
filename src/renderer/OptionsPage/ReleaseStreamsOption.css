@@ -51,8 +51,8 @@
   background: black;
   border-style: solid;
   border-width: 2px;
-  border-color: #00FF88;
-  border-image: linear-gradient(to right, #0F8 0%, transparent 33%, transparent 67%, #0F8 100%) 1;
+  border-color: var(--theme);
+  border-image: linear-gradient(to right, var(--theme) 0%, transparent 33%, transparent 67%, var(--theme) 100%) 1;
 }
 
 .AddReleaseStreamModalFields {

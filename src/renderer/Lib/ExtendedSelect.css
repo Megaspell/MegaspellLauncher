@@ -5,9 +5,9 @@
 .ExtendedSelect__control {
   border-style: solid;
   border-radius: 0;
-  border-color: #0F8;
+  border-color: var(--theme);
   border-width: 1px;
-  border-image: linear-gradient(to right, #0F8 0%, transparent 20%, transparent 80%, #0F8 100%) 1;
+  border-image: linear-gradient(to right, var(--theme) 0%, transparent 20%, transparent 80%, var(--theme) 100%) 1;
   background: #111
 }
 
@@ -22,15 +22,15 @@
 
 .ExtendedSelect__indicator-separator {
   margin: 8px 0;
-  background: #0F8;
+  background: var(--theme);
 }
 
 .ExtendedSelect__menu {
   border-style: solid;
   border-radius: 0;
-  border-color: #0F8;
+  border-color: var(--theme);
   border-width: 1px;
-  border-image: linear-gradient(to right, #0F8 0%, transparent 20%, transparent 80%, #0F8 100%) 1;
+  border-image: linear-gradient(to right, var(--theme) 0%, transparent 20%, transparent 80%, var(--theme) 100%) 1;
   background: #111
 }
 

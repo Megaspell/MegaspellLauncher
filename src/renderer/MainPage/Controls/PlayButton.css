@@ -8,8 +8,8 @@
   border-width: 2px;
   border-style: solid;
   background: #222;
-  border-color: #00FF88;
-  border-image: linear-gradient(to right, #0F8 0%, transparent 15%, transparent 85%, #0F8 100%) 1;
+  border-color: var(--theme);
+  border-image: linear-gradient(to right, var(--theme) 0%, transparent 15%, transparent 85%, var(--theme) 100%) 1;
 }
 
 button.PlayButton:hover:enabled {
@@ -22,7 +22,7 @@ button.PlayButton:active:enabled {
 }
 
 .PlayButton > h1 {
-  color: #0F8;
+  color: var(--theme);
   font-size: 3.5em;
   font-weight: 500;
 }
