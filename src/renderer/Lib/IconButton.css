@@ -1,0 +1,22 @@
+.IconButton {
+  background: transparent;
+  margin: 0;
+  padding: 4px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+}
+
+button.IconButton:hover {
+  background: #fff1;
+  border-image: linear-gradient(to right, #0F8 0%, transparent 33%, transparent 67%, #0F8 100%) 1;
+}
+
+button.IconButton:active {
+  background: #fff1;
+  border-image: linear-gradient(to right, #0F8 0%, transparent 33%, transparent 67%, #0F8 100%) 1;
+}
+
+.IconButton > img {
+  display: block;
+}

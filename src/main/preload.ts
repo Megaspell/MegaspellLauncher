@@ -5,63 +5,118 @@ import { contextBridge, ipcRenderer } from 'electron';
 import AppService, {
   CloseChannel,
   MinimizeChannel,
+  OpenFolderChannel,
+  SelectDirectoryChannel,
   ShowMessageBoxChannel,
 } from '../common/AppService';
-import StoreService, {
-  StoreGetChannel,
-  StoreSetChannel,
-} from '../common/StoreService';
-import GameInstallationService, {
-  CheckAvailableUpdateChannel,
-  DownloadOrUpdateChannel,
-  GetInstalledVersionChannel,
-  UpdateStatus,
-} from '../common/GameInstallationService';
-import GameLaunchService, {
-  LaunchGameChannel,
-} from '../common/GameLaunchService';
+import InstallationService, {
+  GetInstallLocationChannel,
+  GetVersionInstallDirChannel,
+  InstallOrUpdateChannel,
+  InstallProgress,
+  IsVersionInstalledChannel,
+  SetInstallLocationChannel,
+} from '../common/InstallationService';
+import LaunchService, {
+  GetCurrentAppVersionChannel,
+  GetCurrentReleaseStreamChannel,
+  LaunchAppChannel,
+  SetCurrentAppVersionChannel,
+  SetCurrentReleaseStreamChannel,
+} from '../common/LaunchService';
+import ReleaseService, {
+  AddReleaseStreamChannel,
+  FindUpdateChannel,
+  GetLastReleasesChannel,
+  GetReleaseChannel,
+  GetReleaseStreamsChannel,
+  ReleaseStream,
+  RemoveReleaseStreamChannel,
+} from '../common/ReleaseService';
 
 const appApi: AppService = {
   minimize: () => ipcRenderer.send(MinimizeChannel),
+
   close: () => ipcRenderer.send(CloseChannel),
+
   showMessageBox: (title: string, message: string, type: string) =>
     ipcRenderer.send(ShowMessageBoxChannel, title, message, type),
+
+  selectDirectory: (
+    title: string,
+    path: string | undefined,
+    message: string | undefined,
+  ) => ipcRenderer.invoke(SelectDirectoryChannel, title, path, message),
+
+  openFolder: (path: string) => ipcRenderer.send(OpenFolderChannel, path),
 };
 
-const storeApi: StoreService = {
-  get(key: string) {
-    return ipcRenderer.sendSync(StoreGetChannel, key);
-  },
-  set(key: string, value: object | string | number) {
-    ipcRenderer.send(StoreSetChannel, key, value);
+const releaseStreamApi: ReleaseService = {
+  getStreams: () => ipcRenderer.invoke(GetReleaseStreamsChannel),
+
+  addStream: (stream: ReleaseStream) =>
+    ipcRenderer.invoke(AddReleaseStreamChannel, stream),
+
+  removeStream: (stream: ReleaseStream) =>
+    ipcRenderer.invoke(RemoveReleaseStreamChannel, stream),
+
+  getLastReleases: (stream: ReleaseStream) =>
+    ipcRenderer.invoke(GetLastReleasesChannel, stream),
+
+  getRelease: (stream: ReleaseStream, version: string) =>
+    ipcRenderer.invoke(GetReleaseChannel, stream, version),
+
+  findUpdate: (stream: ReleaseStream, version: string) =>
+    ipcRenderer.invoke(FindUpdateChannel, stream, version),
+
+  downloadReleaseArtifact: () => {
+    return Promise.reject(new Error('not supported in renderer'));
   },
 };
 
-const installationApi: GameInstallationService = {
-  getInstalledVersion: () => ipcRenderer.invoke(GetInstalledVersionChannel),
+const installationApi: InstallationService = {
+  getInstallLocation: () => ipcRenderer.invoke(GetInstallLocationChannel),
 
-  checkAvailableUpdate: () => ipcRenderer.invoke(CheckAvailableUpdateChannel),
+  setInstallLocation: (location: string) =>
+    ipcRenderer.invoke(SetInstallLocationChannel, location),
 
-  downloadOrUpdate: async (
+  getVersionInstallDir: (streamId: string, version: string) =>
+    ipcRenderer.invoke(GetVersionInstallDirChannel, streamId, version),
+
+  isVersionInstalled: (streamId: string, version: string) =>
+    ipcRenderer.invoke(IsVersionInstalledChannel, streamId, version),
+
+  installOrUpdate: async (
+    streamId: string,
+    version: string,
     force: boolean,
-    onStatusChange: (status: UpdateStatus) => void,
+    onStatusChange: (status: InstallProgress) => void,
   ) => {
-    const listener = (event, status: UpdateStatus) => onStatusChange(status);
-    ipcRenderer.on(DownloadOrUpdateChannel, listener);
+    const listener = (event, status: InstallProgress) => {
+      onStatusChange(status);
+    };
+    ipcRenderer.on(InstallOrUpdateChannel, listener);
     // eslint-disable-next-line promise/catch-or-return
-    await ipcRenderer.invoke(DownloadOrUpdateChannel, force).finally(() => {
-      ipcRenderer.removeListener(DownloadOrUpdateChannel, listener);
-    });
+    await ipcRenderer.invoke(InstallOrUpdateChannel, streamId, version, force);
   },
 };
 
-const launchApi: GameLaunchService = {
-  launchGame: async () => {
-    await ipcRenderer.invoke(LaunchGameChannel);
-  },
+const launchApi: LaunchService = {
+  getCurrentReleaseStream: () =>
+    ipcRenderer.invoke(GetCurrentReleaseStreamChannel),
+
+  setCurrentReleaseStream: (streamId: string | null) =>
+    ipcRenderer.invoke(SetCurrentReleaseStreamChannel, streamId),
+
+  getCurrentAppVersion: () => ipcRenderer.invoke(GetCurrentAppVersionChannel),
+
+  setCurrentAppVersion: (version: string | null) =>
+    ipcRenderer.invoke(SetCurrentAppVersionChannel, version),
+
+  launchApp: () => ipcRenderer.invoke(LaunchAppChannel),
 };
 
 contextBridge.exposeInMainWorld('appApi', appApi);
-contextBridge.exposeInMainWorld('storeApi', storeApi);
+contextBridge.exposeInMainWorld('releaseStreamApi', releaseStreamApi);
 contextBridge.exposeInMainWorld('installationApi', installationApi);
 contextBridge.exposeInMainWorld('launchApi', launchApi);

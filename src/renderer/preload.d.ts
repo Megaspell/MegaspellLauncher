@@ -1,15 +1,15 @@
-import GameInstallationService from '../common/GameInstallationService';
-import StoreService from '../common/StoreService';
-import GameLaunchService from '../common/GameLaunchService';
+import InstallationService from '../common/InstallationService';
+import LaunchService from '../common/LaunchService';
 import AppService from '../common/AppService';
+import ReleaseService from '../common/ReleaseService';
 
 declare global {
   // eslint-disable-next-line no-unused-vars
   interface Window {
     appApi: AppService;
-    storeApi: StoreService;
-    installationApi: GameInstallationService;
-    launchApi: GameLaunchService;
+    releaseStreamApi: ReleaseService;
+    installationApi: InstallationService;
+    launchApi: LaunchService;
   }
 }
 

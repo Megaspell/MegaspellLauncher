@@ -7,22 +7,18 @@
   justify-content: center;
   border-width: 2px;
   border-style: solid;
-  border-image: linear-gradient(to right, #0F8 0%, transparent 15%, transparent 85%, #0F8 100%) 1;
   background: #222;
+  border-color: #00FF88;
+  border-image: linear-gradient(to right, #0F8 0%, transparent 15%, transparent 85%, #0F8 100%) 1;
 }
 
-.PlayButton:hover:enabled {
+button.PlayButton:hover:enabled {
   border-image: 0;
-  border-color: #00FF88;
   scale: 1.05;
 }
 
-.PlayButton:active {
-  scale: 1;
-}
-
-.PlayButton:disabled {
- filter: brightness(0.5) saturate(0.5);
+button.PlayButton:active:enabled {
+  scale: 0.95;
 }
 
 .PlayButton > h1 {

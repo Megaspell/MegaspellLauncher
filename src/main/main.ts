@@ -1,4 +1,4 @@
-/* eslint global-require: off, no-console: off, promise/always-return: off */
+/* eslint global-require: off, promise/always-return: off, @typescript-eslint/no-unused-vars: off */
 
 /**
  * This module executes inside of electron's main process. You can start
@@ -11,11 +11,11 @@
 import path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
 import { resolveHtmlPath } from './util';
-import LauncherConfig, { loadConfig } from './LauncherConfig';
-import GameInstallationServiceImpl from './GameInstallationServiceImpl';
+import InstallationServiceImpl from './InstallationServiceImpl';
 import StoreServiceImpl from './StoreServiceImpl';
-import GameLaunchServiceImpl from './GameLaunchServiceImpl';
+import LaunchServiceImpl from './LaunchServiceImpl';
 import AppServiceImpl from './AppServiceImpl';
+import ReleaseServiceImpl from './ReleaseServiceImpl';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -31,15 +31,18 @@ if (isDebug) {
   require('electron-debug')();
 }
 
-const launcherConfig: LauncherConfig = loadConfig();
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const services = [
-  new AppServiceImpl(() => mainWindow),
-  new StoreServiceImpl(),
-  new GameInstallationServiceImpl(launcherConfig),
-  new GameLaunchServiceImpl(),
-];
+const appService = new AppServiceImpl(() => mainWindow);
+const storeService = new StoreServiceImpl();
+const releaseStreamService = new ReleaseServiceImpl(storeService);
+const installationService = new InstallationServiceImpl(
+  storeService,
+  releaseStreamService,
+);
+const gameLaunchService = new LaunchServiceImpl(
+  storeService,
+  releaseStreamService,
+  installationService,
+);
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even

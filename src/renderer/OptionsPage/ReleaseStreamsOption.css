@@ -1,0 +1,77 @@
+.ReleaseStreamHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.ReleaseStreamList {
+  margin: 0;
+  padding: 0 0 0 8px;
+}
+
+.ReleaseStreamEntry {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  min-height: 34px;
+}
+
+.DefaultReleaseStreamEntry {
+  padding-left: 28px;
+  filter: brightness(0.5) saturate(0.5);
+}
+
+.ReleaseStreamEntryIcon {
+  padding: 0;
+  display: block;
+}
+
+.AddReleaseStreamModalContainer {
+  z-index: 100 !important;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #000000CC;
+}
+
+.AddReleaseStreamModal {
+  min-width: 400px;
+  min-height: 200px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: black;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #00FF88;
+  border-image: linear-gradient(to right, #0F8 0%, transparent 33%, transparent 67%, #0F8 100%) 1;
+}
+
+.AddReleaseStreamModalFields {
+  width: calc(100% - 16px);
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  padding: 0 8px;
+}
+
+.AddReleaseStreamModalFields input {
+  width: calc(100% - 8px);
+  margin: 4px 0;
+}
+
+.AddReleaseStreamModalButtons {
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  gap: 16px;
+  margin: 12px;
+}

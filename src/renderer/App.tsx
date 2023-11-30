@@ -1,34 +1,17 @@
 import { MemoryRouter as Router, Route, Routes } from 'react-router-dom';
 
-import Blog from './Blog/Blog';
-import WindowButtonGroup from './WindowButtonGroup';
-import SocialButtonGroup from './SocialButtonGroup';
-import Controls from './Controls/Controls';
-
 import './App.css';
-import logoImage from '../../assets/Megaspell_Logo.png';
-
-function Content() {
-  return (
-    <div className="Content">
-      <div className="ContentLeft">
-        <img alt="" height="64px" src={logoImage} />
-        <Controls />
-      </div>
-      <div className="ContentRight">
-        <Blog />
-      </div>
-      <WindowButtonGroup />
-      <SocialButtonGroup />
-    </div>
-  );
-}
+import React from 'react';
+import { MainRoute, OptionsRoute } from './routes';
+import MainPage from './MainPage/MainPage';
+import OptionsPage from './OptionsPage/OptionsPage';
 
 export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Content />} />
+        <Route path={MainRoute} element={<MainPage />} />
+        <Route path={OptionsRoute} element={<OptionsPage />} />
       </Routes>
     </Router>
   );

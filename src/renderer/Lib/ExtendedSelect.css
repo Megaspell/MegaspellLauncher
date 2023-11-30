@@ -1,0 +1,44 @@
+.ExtendedSelect * {
+  -webkit-app-region: no-drag;
+}
+
+.ExtendedSelect__control {
+  border-style: solid;
+  border-radius: 0;
+  border-color: #0F8;
+  border-width: 1px;
+  border-image: linear-gradient(to right, #0F8 0%, transparent 20%, transparent 80%, #0F8 100%) 1;
+  background: #111
+}
+
+.ExtendedSelect__single-value {
+  padding: 0 8px;
+  font-size: 1.2em;
+}
+
+.ExtendedSelect__indicators {
+  gap: 8px;
+}
+
+.ExtendedSelect__indicator-separator {
+  margin: 8px 0;
+  background: #0F8;
+}
+
+.ExtendedSelect__menu {
+  border-style: solid;
+  border-radius: 0;
+  border-color: #0F8;
+  border-width: 1px;
+  border-image: linear-gradient(to right, #0F8 0%, transparent 20%, transparent 80%, #0F8 100%) 1;
+  background: #111
+}
+
+.ExtendedSelect__option {
+  padding: 8px 8px;
+  font-size: 1.2em;
+}
+
+.ExtendedSelect__option--is-focused {
+  background: #333;
+}

@@ -1,36 +1,55 @@
 import './WindowButtonGroup.css';
-import minimizeIcon from '../../assets/images/minimize_FILL0_wght400_GRAD0_opsz24.svg';
-import closeIcon from '../../assets/images/close_FILL0_wght400_GRAD0_opsz24.svg';
+import { useLocation, useNavigate } from 'react-router-dom';
+import optionsIcon from 'assets/images/settings_FILL0_wght400_GRAD0_opsz24.svg';
+import backIcon from 'assets/images/arrow_back_FILL0_wght400_GRAD0_opsz24.svg';
+import minimizeIcon from 'assets/images/minimize_FILL0_wght400_GRAD0_opsz24.svg';
+import closeIcon from 'assets/images/close_FILL0_wght400_GRAD0_opsz24.svg';
+import { OptionsRoute } from './routes';
+import IconButton, { IconButtonProps } from './Lib/IconButton';
 
-interface WindowButtonProps {
-  title: string;
-  icon: string;
-  onClick: () => void;
+function OptionsButton(props: IconButtonProps) {
+  const location = useLocation();
+
+  if (location.pathname === OptionsRoute) {
+    return null;
+  }
+
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  return <IconButton {...props} />;
 }
 
-function WindowButton(props: WindowButtonProps) {
-  const { title, icon, onClick } = props;
-  return (
-    <button
-      title={title}
-      type="button"
-      onClick={onClick}
-      className="WindowButton"
-    >
-      <img height="28" width="28" alt={title} src={icon} />
-    </button>
-  );
+function BackButton(props: IconButtonProps) {
+  const location = useLocation();
+
+  if (location.key === 'default') {
+    return null;
+  }
+
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  return <IconButton {...props} />;
 }
 
 export default function WindowButtonGroup() {
+  const navigate = useNavigate();
+
   return (
     <div className="WindowButtonGroup">
-      <WindowButton
+      <OptionsButton
+        title="Options"
+        icon={optionsIcon}
+        onClick={() => navigate('/options')}
+      />
+      <BackButton
+        title="Go back"
+        icon={backIcon}
+        onClick={() => navigate(-1)}
+      />
+      <IconButton
         title="Minimize"
         icon={minimizeIcon}
         onClick={() => window.appApi.minimize()}
       />
-      <WindowButton
+      <IconButton
         title="Close"
         icon={closeIcon}
         onClick={() => window.appApi.close()}

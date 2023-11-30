@@ -1,8 +1,7 @@
-export const StoreGetChannel = 'storeApi.get';
-export const StoreSetChannel = 'storeApi.set';
-
 export default interface StoreService {
-  get(key: string);
+  get(key: string): object | string | number | null | undefined;
 
-  set(key: string, value: object | string | number);
+  set(key: string, value: object | string | number): void;
+
+  delete(key: string): void;
 }

@@ -1,0 +1,38 @@
+
+.Page {
+  height: 100vh;
+  width: 100vw;
+  background-color: #222;
+  -webkit-app-region: drag;
+}
+
+.PageContainer {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.PageLeft {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  width: 30%;
+  max-width: 30%;
+  height: auto;
+  min-width: 300px;
+  background: rgb(17,17,17);
+  background: radial-gradient(closest-corner, #222222 0%, #181818 100%);
+}
+
+.PageRight {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  width: 70%;
+  height: auto;
+  background-color: #282828;
+}
