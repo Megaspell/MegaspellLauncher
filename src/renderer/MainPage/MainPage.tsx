@@ -213,7 +213,7 @@ export default function MainPage() {
     if (!installationStatus.installed) {
       return 'INSTALL';
     }
-    if (currentVersion !== LatestVersion && availableUpdate) {
+    if (availableUpdate) {
       return 'UPDATE';
     }
     return 'PLAY';

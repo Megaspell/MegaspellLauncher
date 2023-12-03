@@ -179,8 +179,7 @@ export default class InstallationServiceImpl implements InstallationService {
 
     onStatusChange(status);
 
-    const isInstalled = (await this.isVersionInstalled(streamId, version))
-      .installed;
+    const installationStatus = await this.isVersionInstalled(streamId, version);
     const stream = (await this.releaseService.getStreams()).find(
       (s) => s.id === streamId,
     );
@@ -192,9 +191,12 @@ export default class InstallationServiceImpl implements InstallationService {
     }
 
     const appRelease: AppRelease | null =
-      force || !isInstalled
+      force || !installationStatus.installed
         ? await this.releaseService.getRelease(stream, version)
-        : await this.releaseService.findUpdate(stream, version);
+        : await this.releaseService.findUpdate(
+            stream,
+            installationStatus.realVersion!,
+          );
 
     if (!appRelease) {
       status.stage = InstallStage.AlreadyLatest;

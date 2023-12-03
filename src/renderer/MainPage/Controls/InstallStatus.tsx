@@ -72,7 +72,7 @@ export default function InstallStatus(props: InstallStatusProps) {
     return (
       <div className="InstallStatus">
         <h1>Update available!</h1>
-        <h2>Current version: {availableUpdate.version}</h2>
+        <h2>Current version: {installationStatus.realVersion ?? 'none'}</h2>
         <h2>New version: {availableUpdate.version}</h2>
       </div>
     );

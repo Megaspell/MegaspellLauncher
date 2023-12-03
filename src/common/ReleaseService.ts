@@ -66,7 +66,7 @@ export default interface ReleaseService {
   getLastReleases(stream: ReleaseStream, limit: number): Promise<AppRelease[]>;
 
   /**
-   * Get release by version from stream if it exists.
+   * Get release by version from stream if it exists. Passing {@link LatestVersion} will return the last version.
    */
   getRelease(
     stream: ReleaseStream,
