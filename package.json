@@ -219,11 +219,17 @@
         "nsis"
       ]
     },
+    "nsis": {
+      "artifactName": "${productName}-Installer.${ext}"
+    },
     "linux": {
       "target": [
         "AppImage"
       ],
-      "category": "Development"
+      "category": "Game"
+    },
+    "appImage": {
+      "artifactName": "${productName}.${ext}"
     },
     "directories": {
       "app": "release/app",
