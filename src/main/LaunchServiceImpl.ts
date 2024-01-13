@@ -132,7 +132,9 @@ export default class LaunchServiceImpl implements LaunchService {
     const args = await this.buildArgs();
 
     // eslint-disable-next-line camelcase
-    this.currentGameProcess = child_process.execFile(executablePath, args);
+    this.currentGameProcess = child_process.spawn(executablePath, args, {
+      detached: true,
+    });
 
     const bus = new EventEmitter();
 
