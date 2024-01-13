@@ -22,6 +22,7 @@ import ReleaseStreamSelector from './Controls/ReleaseStreamSelector';
 import AppVersionSelector from './Controls/AppVersionSelector';
 import { useCancellableEffect } from '../hooks';
 import GraphicsApiSelector from './Controls/GraphicsApiSelector';
+import LauncherUpdateLink from './Controls/LauncherUpdateLink';
 
 export default function MainPage() {
   const [currentReleaseStream, setCurrentReleaseStream] =
@@ -223,7 +224,10 @@ export default function MainPage() {
     <Page>
       <div className="PageContainer">
         <div className="PageLeft">
-          <img alt="" height="64px" src={logoImage} />
+          <div className="LogoWrapper">
+            <img alt="" height="64px" src={logoImage} />
+            <LauncherUpdateLink />
+          </div>
           <div className="MainPageControls">
             <ReleaseStreamSelector
               current={currentReleaseStream}

@@ -37,6 +37,13 @@ import ReleaseService, {
   ReleaseStream,
   RemoveReleaseStreamChannel,
 } from '../common/ReleaseService';
+import LauncherUpdateService, {
+  GetAvailableUpdateChannel,
+} from '../common/LauncherUpdateService';
+
+const launcherUpdateApi: LauncherUpdateService = {
+  getAvailableUpdate: () => ipcRenderer.invoke(GetAvailableUpdateChannel),
+};
 
 const appApi: AppService = {
   minimize: () => ipcRenderer.send(MinimizeChannel),
@@ -126,6 +133,7 @@ const launchApi: LaunchService = {
   launchApp: () => ipcRenderer.invoke(LaunchAppChannel),
 };
 
+contextBridge.exposeInMainWorld('launcherUpdateApi', launcherUpdateApi);
 contextBridge.exposeInMainWorld('appApi', appApi);
 contextBridge.exposeInMainWorld('releaseStreamApi', releaseStreamApi);
 contextBridge.exposeInMainWorld('installationApi', installationApi);

@@ -16,6 +16,7 @@ import StoreServiceImpl from './StoreServiceImpl';
 import LaunchServiceImpl from './LaunchServiceImpl';
 import AppServiceImpl from './AppServiceImpl';
 import ReleaseServiceImpl from './ReleaseServiceImpl';
+import LauncherUpdateServiceImpl from './LauncherUpdateServiceImpl';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -30,6 +31,9 @@ const isDebug =
 if (isDebug) {
   require('electron-debug')();
 }
+
+const launcherRepo = 'Megaspell/MegaspellLauncher';
+const launcherUpdateService = new LauncherUpdateServiceImpl(launcherRepo);
 
 const appService = new AppServiceImpl(() => mainWindow);
 const storeService = new StoreServiceImpl();
@@ -64,6 +68,30 @@ const installExtensions = async () => {
     )
     .catch(console.log);
 };
+
+function showUpdateMessage() {
+  launcherUpdateService
+    .getAvailableUpdate()
+    .then((upd) => {
+      if (upd == null) return null;
+
+      const shownVersion = storeService.get('updateMessageShownVersion');
+      if (shownVersion === upd.updateVersion) return null;
+      storeService.set('updateMessageShownVersion', upd.updateVersion);
+
+      const dateStr = new Date(upd.updateDate).toLocaleDateString();
+      appService.showMessageBox(
+        'Launcher update',
+        `New update for launcher available!
+Current version: ${upd.currentVersion}
+New version: ${upd.updateVersion} released on ${dateStr}
+Link: ${upd.url}`,
+        'info',
+      );
+      return null;
+    })
+    .catch(() => null);
+}
 
 const createWindow = async () => {
   if (isDebug) {
@@ -117,8 +145,7 @@ const createWindow = async () => {
     return { action: 'deny' };
   });
 
-  // Remove this if your app does not use auto updates
-  // new AppUpdater();
+  showUpdateMessage();
 };
 
 app
