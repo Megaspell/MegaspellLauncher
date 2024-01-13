@@ -13,7 +13,7 @@ import InstallationService, {
 } from '../common/InstallationService';
 import ReleaseService, { AppRelease } from '../common/ReleaseService';
 import StoreService from '../common/StoreService';
-import { tempDir } from './util';
+import { tempDir, getExecutableName } from './util';
 
 const unzipper = require('unzipper');
 
@@ -235,6 +235,9 @@ export default class InstallationServiceImpl implements InstallationService {
       onStatusChange(status);
     });
     onStatusChange(status);
+
+    const executableFile = path.resolve(installDir, getExecutableName());
+    await fs.promises.chmod(executableFile, '755');
 
     const versionFile = path.resolve(installDir, '.version');
     await fs.promises.writeFile(versionFile, appRelease.version, { flag: 'w' });

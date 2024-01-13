@@ -14,8 +14,7 @@ import LaunchService, {
   SetCurrentReleaseStreamChannel,
   SetGraphicsApiChannel,
 } from '../common/LaunchService';
-import { currentPlatform } from './util';
-import TargetPlatform from '../common/TargetPlatform';
+import { getExecutableName } from './util';
 import ReleaseService, {
   DefaultReleaseStream,
   LatestVersion,
@@ -128,10 +127,7 @@ export default class LaunchServiceImpl implements LaunchService {
       currentAppVersion,
     );
 
-    const executablePath = path.resolve(
-      versionDir,
-      LaunchServiceImpl.getExecutableName(),
-    );
+    const executablePath = path.resolve(versionDir, getExecutableName());
 
     const args = await this.buildArgs();
 
@@ -194,17 +190,5 @@ export default class LaunchServiceImpl implements LaunchService {
       this.setGraphicsApi(api),
     );
     ipcMain.handle(LaunchAppChannel, () => this.launchApp());
-  }
-
-  private static getExecutableName(): string {
-    switch (currentPlatform) {
-      case TargetPlatform.PlayerWindows64:
-        return 'Megaspell.exe';
-      case TargetPlatform.PlayerLinux64:
-      case TargetPlatform.ServerLinux64:
-        return 'Megaspell';
-      default:
-        throw new Error(`Unsupported target: ${currentPlatform}`);
-    }
   }
 }

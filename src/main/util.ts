@@ -21,6 +21,18 @@ export const currentPlatform: TargetPlatform = (() => {
   }
 })();
 
+export function getExecutableName(): string {
+  switch (currentPlatform) {
+    case TargetPlatform.PlayerWindows64:
+      return 'Megaspell.exe';
+    case TargetPlatform.PlayerLinux64:
+    case TargetPlatform.ServerLinux64:
+      return 'Megaspell';
+    default:
+      throw new Error(`Unsupported target: ${currentPlatform}`);
+  }
+}
+
 export function resolveHtmlPath(htmlFileName: string) {
   if (process.env.NODE_ENV === 'development') {
     const port = process.env.PORT || 1212;
