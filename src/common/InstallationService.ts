@@ -36,6 +36,8 @@ export const SetInstallLocationChannel = 'installationApi.setInstallLocation';
 export const GetVersionInstallDirChannel =
   'installationApi.getVersionInstallDir';
 export const IsVersionInstalledChannel = 'installationApi.isVersionInstalled';
+export const AreVersionsInstalledChannel =
+  'installationApi.areVersionsInstalled';
 export const InstallOrUpdateChannel = 'installationApi.installOrUpdate';
 
 export default interface InstallationService {
@@ -45,10 +47,25 @@ export default interface InstallationService {
 
   getVersionInstallDir(streamId: string, version: string): Promise<string>;
 
+  /**
+   * Check if version is installed. Does not check for installation integrity.
+   * Also, does not check if installed {@link LatestVersion} is actually the latest.
+   * @param streamId release stream ID.
+   * @param version version ID, or {@link LatestVersion}.
+   */
   isVersionInstalled(
     streamId: string,
     version: string,
   ): Promise<InstallationStatus>;
+
+  /**
+   * Batch version of {@link isVersionInstalled}
+   * Returned array is matching order of {@link versions}.
+   */
+  areVersionsInstalled(
+    streamId: string,
+    versions: string[],
+  ): Promise<InstallationStatus[]>;
 
   installOrUpdate(
     streamId: string,

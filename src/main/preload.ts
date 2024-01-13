@@ -10,6 +10,7 @@ import AppService, {
   ShowMessageBoxChannel,
 } from '../common/AppService';
 import InstallationService, {
+  AreVersionsInstalledChannel,
   GetInstallLocationChannel,
   GetVersionInstallDirChannel,
   InstallOrUpdateChannel,
@@ -88,6 +89,9 @@ const installationApi: InstallationService = {
 
   isVersionInstalled: (streamId: string, version: string) =>
     ipcRenderer.invoke(IsVersionInstalledChannel, streamId, version),
+
+  areVersionsInstalled: (streamId: string, versions: string[]) =>
+    ipcRenderer.invoke(AreVersionsInstalledChannel, streamId, versions),
 
   installOrUpdate: async (
     streamId: string,

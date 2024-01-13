@@ -2,20 +2,23 @@ import path from 'path';
 import fs from 'fs';
 import { app, ipcMain } from 'electron';
 import InstallationService, {
+  AreVersionsInstalledChannel,
   GetInstallLocationChannel,
   GetVersionInstallDirChannel,
   InstallationStatus,
   InstallOrUpdateChannel,
-  InstallStage,
   InstallProgress,
+  InstallStage,
   IsVersionInstalledChannel,
   SetInstallLocationChannel,
 } from '../common/InstallationService';
 import ReleaseService, { AppRelease } from '../common/ReleaseService';
 import StoreService from '../common/StoreService';
-import { tempDir, getExecutableName } from './util';
+import { getExecutableName, tempDir } from './util';
 
 const unzipper = require('unzipper');
+
+const versionFileName = '.version';
 
 const defaultInstallLocation: string = path.resolve(
   app.getPath('userData'),
@@ -103,27 +106,45 @@ export default class InstallationServiceImpl implements InstallationService {
     }
   }
 
-  async isVersionInstalled(
+  isVersionInstalled(
     streamId: string,
     version: string,
   ): Promise<InstallationStatus> {
-    const versionDir = await this.getVersionInstallDir(streamId, version);
-    const dirNotEmpty = await fs.promises
-      .readdir(versionDir)
-      .then((dir) => dir.length > 0)
-      .catch(() => false);
+    return this.getVersionInstallDir(streamId, version)
+      .then((versionDir) =>
+        fs.promises.readFile(path.resolve(versionDir, versionFileName), 'utf8'),
+      )
+      .catch(() => null)
+      .then((versionFromFile) => {
+        return {
+          installed: !!versionFromFile,
+          realVersion: versionFromFile ?? undefined,
+        } as InstallationStatus;
+      });
+  }
 
-    if (!dirNotEmpty) return { installed: false };
-
-    const versionFile = path.resolve(versionDir, '.version');
-    const versionFromFile = await fs.promises
-      .readFile(versionFile, 'utf8')
-      .catch(() => null);
-
-    return {
-      installed: !!versionFromFile,
-      realVersion: versionFromFile ?? undefined,
-    };
+  areVersionsInstalled(
+    streamId: string,
+    versions: string[],
+  ): Promise<InstallationStatus[]> {
+    return Promise.all(
+      versions.map((version) => {
+        return this.getVersionInstallDir(streamId, version)
+          .then((versionDir) =>
+            fs.promises.readFile(
+              path.resolve(versionDir, versionFileName),
+              'utf8',
+            ),
+          )
+          .catch(() => null)
+          .then((versionFromFile) => {
+            return {
+              installed: !!versionFromFile,
+              realVersion: versionFromFile ?? undefined,
+            } as InstallationStatus;
+          });
+      }),
+    );
   }
 
   async installOrUpdate(
@@ -239,7 +260,7 @@ export default class InstallationServiceImpl implements InstallationService {
     const executableFile = path.resolve(installDir, getExecutableName());
     await fs.promises.chmod(executableFile, '755');
 
-    const versionFile = path.resolve(installDir, '.version');
+    const versionFile = path.resolve(installDir, versionFileName);
     await fs.promises.writeFile(versionFile, appRelease.version, { flag: 'w' });
 
     status.stage = InstallStage.PostCleanup;
@@ -299,6 +320,12 @@ export default class InstallationServiceImpl implements InstallationService {
       IsVersionInstalledChannel,
       async (event, streamId: string, version: string) => {
         return this.isVersionInstalled(streamId, version);
+      },
+    );
+    ipcMain.handle(
+      AreVersionsInstalledChannel,
+      async (event, streamId: string, versions: string[]) => {
+        return this.areVersionsInstalled(streamId, versions);
       },
     );
     ipcMain.handle(

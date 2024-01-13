@@ -14,14 +14,20 @@ export interface AppVersionSelectorProps {
   onSelect: (version: string) => void;
 }
 
+export interface AppReleaseOption {
+  version: string;
+  downloadSize: number;
+  installed: boolean;
+}
+
 const lastAppVersionsToShow = 50;
 
 export default function AppVersionSelector(props: AppVersionSelectorProps) {
   const { releaseStream } = props;
 
-  const [selectableVersions, setSelectableVersions] = useState<AppRelease[]>(
-    [],
-  );
+  const [selectableVersions, setSelectableVersions] = useState<
+    AppReleaseOption[]
+  >([]);
 
   useCancellableEffect(
     (isCancelled) => {
@@ -31,11 +37,28 @@ export default function AppVersionSelector(props: AppVersionSelectorProps) {
 
       window.releaseStreamApi
         .getLastReleases(releaseStream, lastAppVersionsToShow)
+        .then((releases) =>
+          [{ version: LatestVersion, downloadSize: 0 }].concat(releases),
+        )
+        .then((releases) => {
+          return window.installationApi
+            .areVersionsInstalled(
+              releaseStream.id,
+              releases.map((release) => release.version),
+            )
+            .then((installStatuses) => {
+              return releases.map((release, index) => {
+                return {
+                  version: release.version,
+                  downloadSize: release.downloadSize,
+                  installed: installStatuses[index].installed,
+                } as AppReleaseOption;
+              });
+            });
+        })
         .then((versions) => {
           if (isCancelled()) return null;
-          return setSelectableVersions(
-            [{ version: LatestVersion, downloadSize: 0 }].concat(versions),
-          );
+          return setSelectableVersions(versions);
         })
         .catch((error) =>
           window.appApi.showMessageBox(
@@ -53,21 +76,33 @@ export default function AppVersionSelector(props: AppVersionSelectorProps) {
   return (
     <div className="SelectorControl">
       <h2>Version</h2>
-      <ExtendedSelect<AppRelease>
+      <ExtendedSelect<AppReleaseOption>
         options={selectableVersions}
-        value={{
-          version: current,
-          downloadSize: 0,
-        }}
+        value={
+          selectableVersions.find((option) => option.version === current) ??
+          ({
+            version: current,
+            downloadSize: 0,
+            installed: false,
+          } as AppReleaseOption)
+        }
         onChange={(option: AppRelease) => {
           onSelect(option.version);
         }}
-        getOptionLabel={(it) =>
-          it.version +
-          (it.downloadSize > 0
-            ? ` (${Math.round(it.downloadSize / 1000 / 1000)} MB)`
-            : '')
-        }
+        getOptionLabel={(it) => {
+          if (it.version === LatestVersion) {
+            return 'Latest version';
+          }
+          if (it.installed) {
+            return `${it.version} (installed)`;
+          }
+          if (it.downloadSize > 0) {
+            return `${it.version} (${Math.round(
+              it.downloadSize / 1000 / 1000,
+            )} MB)`;
+          }
+          return it.version;
+        }}
         getOptionValue={(s) => s.version}
         isSearchable={false}
       />
