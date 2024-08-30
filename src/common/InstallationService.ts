@@ -20,7 +20,7 @@ export interface InstallProgress {
    * Download size in bytes.
    */
   downloadSize: number;
-  error: Error;
+  error: string;
 }
 
 export interface InstallationStatus {
