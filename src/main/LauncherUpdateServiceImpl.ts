@@ -19,7 +19,7 @@ export default class LauncherUpdateServiceImpl
 
   private cachedAvailableUpdate: LauncherUpdate | null | undefined;
 
-  constructor(launcherRepo) {
+  constructor(launcherRepo: string) {
     this.updateUrl = `https://api.github.com/repos/${launcherRepo}/releases/latest`;
     this.registerIpc();
   }

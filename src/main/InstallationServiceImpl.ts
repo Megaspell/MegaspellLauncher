@@ -15,6 +15,7 @@ import InstallationService, {
 import ReleaseService, { AppRelease } from '../common/ReleaseService';
 import StoreService from '../common/StoreService';
 import { getExecutableName, tempDir } from './util';
+import errorToString from '../common/ErrorUtils';
 
 const unzipper = require('unzipper');
 
@@ -84,7 +85,9 @@ export default class InstallationServiceImpl implements InstallationService {
   // eslint-disable-next-line class-methods-use-this
   private async cleanupInterruptedInstall() {
     if (fs.existsSync(tempDir)) {
-      await fs.promises.rm(tempDir, { recursive: true });
+      await fs.promises
+        .rm(tempDir, { recursive: true, force: true })
+        .catch((e) => console.log('Failed to force remove temp dir', e));
     }
 
     if (!fs.existsSync(installLockFilePath)) return;
@@ -100,7 +103,9 @@ export default class InstallationServiceImpl implements InstallationService {
         installLock.version,
       );
       if (fs.existsSync(versionDir)) {
-        await fs.promises.rm(versionDir, { recursive: true });
+        await fs.promises
+          .rm(versionDir, { recursive: true, force: true })
+          .catch((e) => console.log('Failed to force remove version dir', e));
       }
       await fs.promises.rm(installLockFilePath);
     }
@@ -180,7 +185,7 @@ export default class InstallationServiceImpl implements InstallationService {
     } catch (e) {
       onStatusChange({
         stage: InstallStage.Failed,
-        error: e,
+        error: e ? errorToString(e as Error) : 'Unknown error',
       } as InstallProgress);
       await this.cleanupInterruptedInstall();
     }
@@ -206,7 +211,7 @@ export default class InstallationServiceImpl implements InstallationService {
     );
     if (!stream) {
       status.stage = InstallStage.Failed;
-      status.error = new Error(`Release stream ${streamId} not found`);
+      status.error = `Release stream ${streamId} not found`;
       onStatusChange(status);
       return;
     }

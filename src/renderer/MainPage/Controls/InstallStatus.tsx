@@ -1,9 +1,10 @@
-import {
-  InstallStage,
-  InstallProgress,
-  InstallationStatus,
-} from '../../../common/InstallationService';
+import { useEffect } from 'react';
 
+import {
+  InstallationStatus,
+  InstallProgress,
+  InstallStage,
+} from '../../../common/InstallationService';
 import './InstallStatus.css';
 import { AppRelease } from '../../../common/ReleaseService';
 
@@ -47,6 +48,16 @@ interface InstallStatusProps {
 
 export default function InstallStatus(props: InstallStatusProps) {
   const { installationStatus, availableUpdate, updateStatus } = props;
+
+  useEffect(() => {
+    if (updateStatus?.stage === InstallStage.Failed) {
+      window.appApi.showMessageBox(
+        'Installation failed!',
+        updateStatus.error ?? '',
+        'error',
+      );
+    }
+  }, [updateStatus?.stage, updateStatus?.error]);
 
   if (updateStatus) {
     return (

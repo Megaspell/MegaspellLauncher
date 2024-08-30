@@ -1,6 +1,5 @@
 import path from 'path';
 import fs from 'fs';
-import { finished } from 'stream/promises';
 import { Readable } from 'stream';
 import { ReadableStream } from 'node:stream/web';
 import EventEmitter from 'node:events';
@@ -49,6 +48,9 @@ interface RepoReleases {
   appReleases: AppRelease[];
   appReleasesByVersion: Map<string, AppRelease>;
 }
+
+const maxDownloadRetries = 10;
+const baseDownloadRetryDelay = 1000;
 
 export default class GithubReleaseProvider implements ReleaseProvider {
   private cachedReleasesByRepo: Map<string, RepoReleases> = new Map();
@@ -192,31 +194,26 @@ export default class GithubReleaseProvider implements ReleaseProvider {
 
     await fs.promises.mkdir(destination, { recursive: true });
 
-    let downloaded = 0;
+    let downloadedTotalBytes = 0;
 
-    const incrementDownloaded = (chunk: any) => {
-      downloaded += chunk.length;
-      onDownloadProgress(downloaded);
+    const onDataEvent = (chunk: Buffer) => {
+      downloadedTotalBytes += chunk.length;
+      onDownloadProgress(downloadedTotalBytes);
     };
-
-    const headers = new Headers();
-    headers.set('Accept', 'application/octet-stream');
-    if (stream.githubToken) {
-      headers.set('Authorization', `Bearer ${stream.githubToken}`);
-    }
 
     const artifact = Array.isArray(release.artifact)
       ? release.artifact
       : [release.artifact];
 
+    // Download all artifacts to a single file by concatenating
+
     // eslint-disable-next-line no-restricted-syntax
     for await (const asset of artifact) {
-      const response = await fetch(asset.url, { headers });
-      const fileStream = fs.createWriteStream(downloadPath, { flags: 'a' });
-      await finished(
-        Readable.fromWeb(response.body as ReadableStream)
-          .on('data', incrementDownloaded)
-          .pipe(fileStream),
+      await GithubReleaseProvider.downloadArtifactPart(
+        stream.githubToken,
+        downloadPath,
+        asset,
+        onDataEvent,
       );
     }
 
@@ -224,6 +221,73 @@ export default class GithubReleaseProvider implements ReleaseProvider {
       version: release.version,
       artifactPath: downloadPath,
     };
+  }
+
+  private static async downloadArtifactPart(
+    githubToken: string | undefined,
+    downloadPath: string,
+    asset: GithubReleaseAsset,
+    onDataEvent: (chunk: Buffer) => void,
+  ) {
+    async function getDownloadedTotalSize(): Promise<number> {
+      return fs.promises
+        .stat(downloadPath)
+        .then((it) => it.size)
+        .catch(() => 0);
+    }
+
+    async function attemptDownload(rangeFrom: number) {
+      const headers = new Headers();
+      headers.set('Accept', 'application/octet-stream');
+      if (githubToken) {
+        headers.set('Authorization', `Bearer ${githubToken}`);
+      }
+
+      if (rangeFrom > 0) {
+        headers.set('Range', `bytes=${rangeFrom}-`);
+      }
+
+      const response = await fetch(asset.url, { headers });
+      const fileStream = fs.createWriteStream(downloadPath, { flags: 'a' });
+
+      return new Promise((resolve, reject) => {
+        Readable.fromWeb(response.body as ReadableStream)
+          .on('data', onDataEvent)
+          .on('end', resolve)
+          .on('error', reject)
+          .pipe(fileStream);
+      }).finally(() => fileStream.close());
+    }
+
+    const byteOffset = await getDownloadedTotalSize();
+
+    // On failure, continue download from the same place using Range offset
+    // eslint-disable-next-line no-plusplus
+    for (let attempt = 1; attempt <= maxDownloadRetries; attempt++) {
+      // eslint-disable-next-line no-await-in-loop
+      const rangeFrom = (await getDownloadedTotalSize()) - byteOffset;
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await attemptDownload(rangeFrom);
+        break;
+      } catch (e) {
+        const delay = baseDownloadRetryDelay * attempt;
+        console.log(
+          `Download of ${asset.name} range from ${rangeFrom} failed, retrying in ${delay}ms`,
+          e,
+        );
+        if (attempt === maxDownloadRetries) {
+          throw Error(
+            'Failed to download the game from GitHub, please try again later.',
+            { cause: e },
+          );
+        }
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((resolve) => {
+          setTimeout(resolve, delay);
+        });
+      }
+    }
   }
 
   private static async requestGithubApi<T>(
