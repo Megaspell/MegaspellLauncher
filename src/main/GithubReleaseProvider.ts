@@ -49,7 +49,7 @@ interface RepoReleases {
   appReleasesByVersion: Map<string, AppRelease>;
 }
 
-const maxDownloadRetries = 5;
+const maxDownloadRetries = 10;
 const baseDownloadRetryDelay = 1000;
 
 export default class GithubReleaseProvider implements ReleaseProvider {

@@ -43,8 +43,6 @@ export default function GraphicsApiSelector() {
       });
   };
 
-  console.log(options);
-
   return (
     <div className="SelectorControl">
       <h2>Graphics API</h2>
