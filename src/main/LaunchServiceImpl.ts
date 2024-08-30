@@ -99,7 +99,7 @@ export default class LaunchServiceImpl implements LaunchService {
     const value = this.storeService.get(graphicsApiStoreKey);
     if (
       typeof value === 'string' &&
-      Object.values(GraphicsApi).includes(value)
+      Object.values(GraphicsApi).includes(value as GraphicsApi)
     ) {
       return value as GraphicsApi;
     }
