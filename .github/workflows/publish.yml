@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [windows-latest, ubuntu-latest]
 
     steps:
       - name: Checkout git repo
@@ -31,4 +31,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.UPLOAD_RELEASE_GH_TOKEN }}
         run: |
-          npm exec electron-builder -- --publish always --win --linux
+          npm exec electron-builder -- --publish always
